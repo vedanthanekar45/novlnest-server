@@ -4,9 +4,19 @@ import (
 	"log"
 	"net/http"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/vedanthanekar45/novlnest-server/db"
 )
 
 func main() {
+
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading env file")
+	}
+
+	db.ConnectDB()
 	router := http.NewServeMux()
 
 	router.HandleFunc("GET /api/v1/health", handleHealth)

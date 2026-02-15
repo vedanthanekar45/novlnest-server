@@ -7,21 +7,35 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/vedanthanekar45/novlnest-server/db"
+	"github.com/vedanthanekar45/novlnest-server/db/internal/database"
 )
 
-func main() {
+type APIServer struct {
+	addr  string
+	store *database.Queries // This is the SQLC struct!
+}
 
+func main() {
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading env file")
 	}
 
 	db.ConnectDB()
+	defer db.Conn.Close()
+
+	queries := database.New(db.Conn)
+
+	app := &APIServer{
+		addr:  ":8000",
+		store: queries,
+	}
+
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /api/v1/health", handleHealth)
-	router.HandleFunc("POST /api/v1/users", handleCreateUser)
-	router.HandleFunc("GET /api/v1/users/{id}", handleGetUser)
+	router.HandleFunc("GET /api/v1/health", app.handleHealth)
+	router.HandleFunc("POST /api/v1/users", app.handleCreateUser)
+	router.HandleFunc("GET /api/v1/users/{id}", app.handleGetUser)
 
 	stack := LoggerMiddleware(router)
 
@@ -38,16 +52,16 @@ func main() {
 	}
 }
 
-func handleHealth(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
 }
 
-func handleGetUser(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
 	id := r.PathValue("id")
 	w.Write([]byte("Fetching user " + id))
 }
 
-func handleCreateUser(w http.ResponseWriter, r *http.Request) {
+func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("User created"))
 }

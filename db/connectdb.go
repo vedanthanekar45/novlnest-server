@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-var Conn *pgx.Conn
+var Conn *pgxpool.Pool
 
 func ConnectDB() {
 	var dbURL = os.Getenv("POSTGRES_CONNECTION_STRING")
 	fmt.Println(dbURL)
 
-	conn, err := pgx.Connect(context.Background(), dbURL)
+	conn, err := pgxpool.New(context.Background(), dbURL)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database %v\n", err)
 		os.Exit(1)

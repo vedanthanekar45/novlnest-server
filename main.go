@@ -7,12 +7,11 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/vedanthanekar45/novlnest-server/db"
-	"github.com/vedanthanekar45/novlnest-server/db/internal/database"
 )
 
 type APIServer struct {
 	addr  string
-	store *database.Queries // This is the SQLC struct!
+	store *db.Queries
 }
 
 func main() {
@@ -24,7 +23,7 @@ func main() {
 	db.ConnectDB()
 	defer db.Conn.Close()
 
-	queries := database.New(db.Conn)
+	queries := db.NewQueries(db.Conn)
 
 	app := &APIServer{
 		addr:  ":8000",

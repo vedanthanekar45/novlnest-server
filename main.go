@@ -6,13 +6,9 @@ import (
 	"time"
 
 	"github.com/joho/godotenv"
+	"github.com/vedanthanekar45/novlnest-server/api"
 	"github.com/vedanthanekar45/novlnest-server/db"
 )
-
-type APIServer struct {
-	addr  string
-	store *db.Queries
-}
 
 func main() {
 	err := godotenv.Load()
@@ -25,16 +21,16 @@ func main() {
 
 	queries := db.NewQueries(db.Conn)
 
-	app := &APIServer{
-		addr:  ":8000",
-		store: queries,
+	apiCfg := &api.ApiConfig{
+		Store: queries,
 	}
 
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /api/v1/health", app.handleHealth)
-	router.HandleFunc("POST /api/v1/users", app.handleCreateUser)
-	router.HandleFunc("GET /api/v1/users/{id}", app.handleGetUser)
+	router.HandleFunc("GET /api/v1/health", handleHealth)
+
+	router.HandleFunc("GET /api/v1/auth/google/login", apiCfg.HandleGoogleLogin)
+	router.HandleFunc("GET /api/v1/auth/google/callback", apiCfg.HandleGetUser)
 
 	stack := LoggerMiddleware(router)
 
@@ -51,16 +47,7 @@ func main() {
 	}
 }
 
-func (s *APIServer) handleHealth(w http.ResponseWriter, r *http.Request) {
+func handleHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("OK"))
-}
-
-func (s *APIServer) handleGetUser(w http.ResponseWriter, r *http.Request) {
-	id := r.PathValue("id")
-	w.Write([]byte("Fetching user " + id))
-}
-
-func (s *APIServer) handleCreateUser(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("User created"))
 }

@@ -29,8 +29,9 @@ func main() {
 
 	router.HandleFunc("GET /api/v1/health", handleHealth)
 
+	// the fabled authentication routes..
 	router.HandleFunc("GET /api/v1/auth/google/login", apiCfg.HandleGoogleLogin)
-	router.HandleFunc("GET /api/v1/auth/google/callback", apiCfg.HandleGetUser)
+	router.HandleFunc("GET /api/v1/auth/google/callback", apiCfg.HandleGoogleCallback)
 
 	stack := LoggerMiddleware(router)
 

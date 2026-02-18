@@ -8,7 +8,9 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/golang-jwt/jwt/v5"
 	"github.com/jackc/pgx/v5/pgtype"
 	db "github.com/vedanthanekar45/novlnest-server/db/database"
 	"golang.org/x/oauth2"
@@ -82,6 +84,27 @@ func (cfg *ApiConfig) HandleGoogleCallback(w http.ResponseWriter, r *http.Reques
 		http.Error(w, "Database error: "+err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	jwtToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"sub": user.ID.String(),
+		"iss": "novlnest",
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+	})
+
+	jwtSecret := []byte(os.Getenv("JWT_SECRET"))
+	tokenString, err := jwtToken.SignedString(jwtSecret)
+	if err != nil {
+		http.Error(w, "Signing Error", http.StatusInternalServerError)
+		return
+	}
+
+	RespondWithJSON(w, 200, struct {
+		Token string      `json:"token"`
+		User  interface{} `json:"user"`
+	}{
+		Token: tokenString,
+		User:  user,
+	})
 
 	fmt.Fprintf(w, "Welcome %s! You are logged in.", user.Name.String)
 }

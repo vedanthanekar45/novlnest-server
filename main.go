@@ -3,11 +3,14 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/vedanthanekar45/novlnest-server/api"
 	"github.com/vedanthanekar45/novlnest-server/db"
+	"golang.org/x/oauth2"
+	"golang.org/x/oauth2/google"
 )
 
 func main() {
@@ -21,8 +24,20 @@ func main() {
 
 	queries := db.NewQueries(db.Conn)
 
+	oauthConfig := &oauth2.Config{
+		ClientID:     os.Getenv("GOOGLE_CLIENT_ID"),
+		ClientSecret: os.Getenv("GOOGLE_CLIENT_SECRET"),
+		RedirectURL:  "http://localhost:8000/api/v1/auth/google/callback",
+		Scopes: []string{
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+		},
+		Endpoint: google.Endpoint,
+	}
+
 	apiCfg := &api.ApiConfig{
 		Store: queries,
+		OAuth: oauthConfig,
 	}
 
 	router := http.NewServeMux()
@@ -46,6 +61,14 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func LoggerMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		next.ServeHTTP(w, r)
+		log.Printf("%s %s %v", r.Method, r.URL.Path, time.Since(start))
+	})
 }
 
 func handleHealth(w http.ResponseWriter, r *http.Request) {

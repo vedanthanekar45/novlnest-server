@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE shelves (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     userid UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -33,3 +34,8 @@ CREATE TABLE book_logs (
     updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
     UNIQUE(userid, google_id)
 );
+
+-- +goose Down
+DROP TABLE book_logs;
+DROP TABLE shelf_books;
+DROP TABLE shelves;

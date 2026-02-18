@@ -42,11 +42,10 @@ type ShelfBook struct {
 
 type User struct {
 	ID           pgtype.UUID
-	Username     string
 	Email        string
 	CreatedAt    pgtype.Timestamp
 	UpdatedAt    pgtype.Timestamp
-	PasswordHash string
+	PasswordHash pgtype.Text
 	GoogleID     pgtype.Text
 	Name         pgtype.Text
 	AvatarUrl    pgtype.Text

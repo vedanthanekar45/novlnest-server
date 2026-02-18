@@ -36,7 +36,7 @@ var googleOAuthConfig = &oauth2.Config{
 // this is where we handle the login..
 func (cfg *ApiConfig) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) {
 	oauth_state := generateStateOauthCookie(w)
-	url := googleOAuthConfig.AuthCodeURL(oauth_state)
+	url := cfg.OAuth.AuthCodeURL(oauth_state)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 
@@ -49,7 +49,7 @@ func (cfg *ApiConfig) HandleGoogleCallback(w http.ResponseWriter, r *http.Reques
 	}
 
 	code := r.FormValue("code")
-	token, err := googleOAuthConfig.Exchange(context.Background(), code)
+	token, err := cfg.OAuth.Exchange(context.Background(), code)
 	if err != nil {
 		http.Error(w, "Code exchange failed", http.StatusInternalServerError)
 		return

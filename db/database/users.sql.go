@@ -20,7 +20,7 @@ DO UPDATE SET
     name = EXCLUDED.name,
     avatar_url = EXCLUDED.avatar_url,
     updated_at = NOW()
-RETURNING id, username, email, created_at, updated_at, password_hash, google_id, name, avatar_url
+RETURNING id, email, created_at, updated_at, password_hash, google_id, name, avatar_url
 `
 
 type CreateUserOrUpdateParams struct {
@@ -40,7 +40,6 @@ func (q *Queries) CreateUserOrUpdate(ctx context.Context, arg CreateUserOrUpdate
 	var i User
 	err := row.Scan(
 		&i.ID,
-		&i.Username,
 		&i.Email,
 		&i.CreatedAt,
 		&i.UpdatedAt,

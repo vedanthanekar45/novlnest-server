@@ -3,7 +3,7 @@ CREATE TABLE users (
     username TEXT NOT NULL UNIQUE,
     email TEXT NOT NULL UNIQUE,
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-    updated_at TIMESTAMP NOT NULL  DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
     password_hash TEXT NOT NULL,
     google_id TEXT UNIQUE,
     name TEXT,

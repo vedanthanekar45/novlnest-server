@@ -1,6 +1,6 @@
 package db
 
-import "github.com/vedanthanekar45/novlnest-server/db/internal/database"
+import "github.com/vedanthanekar45/novlnest-server/db/database"
 
 type Queries = database.Queries
 

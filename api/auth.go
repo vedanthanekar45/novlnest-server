@@ -41,7 +41,11 @@ func (cfg *ApiConfig) HandleGoogleLogin(w http.ResponseWriter, r *http.Request) 
 }
 
 func (cfg *ApiConfig) HandleGoogleCallback(w http.ResponseWriter, r *http.Request) {
-	oauth_state, _ := r.Cookie("oauth_state")
+	oauth_state, err := r.Cookie("oauth_state")
+	if err != nil {
+		http.Error(w, "Missing oauth state cookie", http.StatusUnauthorized)
+		return
+	}
 
 	if r.FormValue("state") != oauth_state.Value {
 		http.Error(w, "Invalid google oauth state", http.StatusUnauthorized)

@@ -6,7 +6,7 @@ import (
 )
 
 func RespondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	w.Header().Set("Content-Type", "applicatio/json")
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	if payload != nil {
 		json.NewEncoder(w).Encode(payload)

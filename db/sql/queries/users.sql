@@ -8,3 +8,7 @@ DO UPDATE SET
     avatar_url = EXCLUDED.avatar_url,
     updated_at = NOW()
 RETURNING *; 
+
+-- name: GetUsersByID :one
+SELECT * FROM users
+WHERE id = $1 LIMIT 1;

@@ -49,3 +49,23 @@ func (q *Queries) CreateUserOrUpdate(ctx context.Context, arg CreateUserOrUpdate
 	)
 	return i, err
 }
+
+const getUsersByID = `-- name: GetUsersByID :one
+SELECT id, email, created_at, updated_at, google_id, name, avatar_url FROM users
+WHERE id = $1 LIMIT 1
+`
+
+func (q *Queries) GetUsersByID(ctx context.Context, id pgtype.UUID) (User, error) {
+	row := q.db.QueryRow(ctx, getUsersByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.Email,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.GoogleID,
+		&i.Name,
+		&i.AvatarUrl,
+	)
+	return i, err
+}

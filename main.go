@@ -42,11 +42,15 @@ func main() {
 
 	router := http.NewServeMux()
 
+	// the good ol' testing routes
 	router.HandleFunc("GET /api/v1/health", handleHealth)
+	router.HandleFunc("GET /api/v1/users/me", apiCfg.MiddlewareAuth(apiCfg.GetUserData))
 
 	// the fabled authentication routes..
 	router.HandleFunc("GET /api/v1/auth/google/login", apiCfg.HandleGoogleLogin)
 	router.HandleFunc("GET /api/v1/auth/google/callback", apiCfg.HandleGoogleCallback)
+
+	// the prophecised book routes
 
 	stack := LoggerMiddleware(router)
 
